@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Model Evaluation & Resampling Explorer | Version 2</title>
+<style>
+:root{--g:#126459;--pg:#eef6f4;--gold:#d5a100;--py:#fff8dc;--ink:#222;--muted:#5d6865;--line:#d9e4e1;--soft:#f7f9f8;--test:#d5a100}
+*{box-sizing:border-box} body{margin:0;background:#f4f7f6;color:var(--ink);font:16px Arial,Helvetica,sans-serif;line-height:1.55}
+.wrap{max-width:1100px;margin:28px auto;padding:0 18px 42px}.hero{background:var(--g);color:#fff;padding:27px 30px;border-radius:10px}
+.hero h1{margin:4px 0;font-size:30px}.k{font-size:13px;font-weight:700;letter-spacing:1px}.card{background:#fff;border:1px solid var(--line);padding:26px 30px;margin-top:16px;border-radius:9px}
+h2,h3{color:var(--g)} h2{margin-top:0}.q{background:var(--py);border-left:5px solid var(--gold);padding:16px 18px;margin:18px 0}.call{background:var(--pg);border-left:5px solid var(--g);padding:16px 18px;margin:18px 0}
+.flow{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin:20px 0}.step{border:1px solid var(--line);background:var(--soft);padding:12px 15px;border-radius:7px;font-weight:700}.arrow{color:var(--g);font-size:22px;font-weight:bold}
+.defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.def{border:1px solid var(--line);border-radius:8px;padding:15px}.def b{color:var(--g)}
+button{background:var(--g);color:#fff;border:0;border-radius:6px;padding:11px 16px;font-weight:700;cursor:pointer;margin:4px 6px 4px 0}button:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;max-width:600px;margin:18px auto}.dot{aspect-ratio:1;border-radius:4px;background:var(--g);transition:.35s;position:relative}.dot.test{background:var(--test)}
+.legend{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;font-size:14px}.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}.train{background:var(--g)}.testsw{background:var(--test)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:18px 0}.metric{border:1px solid var(--line);border-radius:8px;padding:14px;background:var(--soft)}.lab{font-size:13px;color:var(--muted)}.val{font-size:25px;font-weight:700;color:var(--g)}
+.barrow{display:grid;grid-template-columns:75px 1fr 70px;gap:10px;align-items:center;margin:8px 0}.bar{height:20px;background:#e9efed;border-radius:5px;overflow:hidden}.fill{height:100%;background:var(--g)}
+.hidden{display:none} table{width:100%;border-collapse:collapse;margin:16px 0}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}th{background:var(--pg)}
+.small{font-size:14px;color:var(--muted)}.footer{text-align:center;color:var(--g);font-weight:700;padding:26px}
+@media(max-width:650px){.hero h1{font-size:24px}.card,.hero{padding:20px}.grid{gap:4px}.barrow{grid-template-columns:62px 1fr 58px}}
+</style>
+</head>
+<body><div class="wrap">
+<header class="hero"><div class="k">ANLY 530 | WEEK 5 INTERACTIVE | VERSION 2</div><h1>Model Evaluation &amp; Resampling Explorer</h1><div>See the split before you interpret the score</div></header>
+
+<section class="card">
+<div class="q"><b>Professor's Challenge</b><br>Your model achieved 90% accuracy on a test set. What else must you know before treating 90% as credible evidence of future performance?</div>
+<h2>Before We Evaluate: What Is a Train/Test Split?</h2>
+<p>A train/test split separates available observations into two roles. The model learns from one portion and is evaluated on observations it was not allowed to learn from.</p>
+<div class="flow"><div class="step">Available Data</div><div class="arrow">→</div><div class="step">Train/Test Split</div><div class="arrow">→</div><div class="step">Fit on Train</div><div class="arrow">→</div><div class="step">Evaluate on Test</div></div>
+<div class="defs">
+<div class="def"><b>Training set</b><br>Observations the model is allowed to learn from.</div>
+<div class="def"><b>Test set</b><br>Held-out observations used to estimate performance on unseen data.</div>
+<div class="def"><b>Random state / seed</b><br>Makes a random assignment reproducible. It is not a knob for searching for a favorable score.</div>
+</div>
+<div class="call"><b>Our experiment:</b> 1,000 illustrative observations • 80% training (800) • 20% testing (200). The dataset, target, predictors, algorithm, settings, and 80/20 ratio stay fixed. <b>Only which observations enter each set changes.</b></div>
+<p class="small">The 100 squares below represent the 1,000 observations in groups of 10, so 80 squares represent training data and 20 represent test data.</p>
+</section>
+
+<section class="card"><h2>1. See the First Split</h2>
+<p>Before looking at performance, look at the data partition.</p>
+<div id="dots1" class="grid"></div>
+<div class="legend"><span><i class="sw train"></i>Training: 800 observations</span><span><i class="sw testsw"></i>Test: 200 observations</span></div>
+<div style="text-align:center;margin-top:18px"><button onclick="runFirst()">Fit Model &amp; Evaluate Split 1</button></div>
+<div id="firstResult" class="hidden">
+<div class="metrics"><div class="metric"><div class="lab">Modeling Procedure</div><div class="val" style="font-size:18px">Unchanged</div></div><div class="metric"><div class="lab">Train / Test</div><div class="val">80 / 20</div></div><div class="metric"><div class="lab">Test Accuracy</div><div class="val">84.0%</div></div></div>
+<div class="q"><b>Would you report 84% as “the model's accuracy”?</b><br>Make a prediction before continuing.</div>
+<button onclick="showSecond()">Re-Split the Same Data</button>
+</div></section>
+
+<section id="secondCard" class="card hidden"><h2>2. Same Procedure. Different Observations.</h2>
+<p>We keep the 80/20 ratio and modeling procedure fixed, but randomly assign observations again. Watch which squares change roles.</p>
+<div id="dots2" class="grid"></div>
+<div class="legend"><span><i class="sw train"></i>Training: 800 observations</span><span><i class="sw testsw"></i>Test: 200 observations</span></div>
+<div class="metrics"><div class="metric"><div class="lab">Split 1 Accuracy</div><div class="val">84.0%</div></div><div class="metric"><div class="lab">Split 2 Accuracy</div><div class="val">91.0%</div></div><div class="metric"><div class="lab">Difference</div><div class="val">+7.0 pts</div></div></div>
+<div class="q"><b>Same dataset. Same algorithm. Same settings. Same 80/20 ratio. Different training and test observations.</b><br><br>Why did estimated performance change from 84% to 91%?</div>
+<div class="call"><b>Precision matters:</b> The <em>modeling procedure</em> stayed the same, but fitting that procedure to a different training sample can produce a different <em>fitted model</em>.</div>
+<button onclick="startRepeats()">Repeat the Experiment</button>
+</section>
+
+<section id="repeatCard" class="card hidden"><h2>3. What Happens Across More Splits?</h2>
+<p>Continue the experiment. We are studying variability—not searching for the seed that gives us the score we like.</p>
+<button id="again" onclick="addSplit()">Run Another Split</button>
+<div class="metrics"><div class="metric"><div class="lab">Splits Observed</div><div id="count" class="val"></div></div><div class="metric"><div class="lab">Lowest Accuracy</div><div id="lo" class="val"></div></div><div class="metric"><div class="lab">Highest Accuracy</div><div id="hi" class="val"></div></div></div>
+<div id="bars"></div><button id="reveal" class="hidden" onclick="showDist()">Reveal the Performance Distribution</button>
+</section>
+
+<section id="distCard" class="card hidden"><h2>4. Stop Looking for “The” Score</h2>
+<p>Across reasonable samples, performance is better understood as a <b>distribution of estimates</b>.</p>
+<div class="metrics"><div class="metric"><div class="lab">Mean Accuracy</div><div id="mean" class="val"></div></div><div class="metric"><div class="lab">Std. Deviation</div><div id="sdout" class="val"></div></div><div class="metric"><div class="lab">Observed Range</div><div id="range" class="val" style="font-size:19px"></div></div></div>
+<div class="call">The mean summarizes typical observed performance. The spread reminds us that the estimate depends partly on which observations were available for training and evaluation.</div>
+<div class="q"><b>Would you report the best split, worst split, first split, or evidence across multiple samples? Why?</b></div>
+<button onclick="showCV()">Move to Cross-Validation</button>
+</section>
+
+<section id="cvCard" class="card hidden"><h2>5. From Repeated Holdouts to Cross-Validation</h2>
+<p>Repeated arbitrary holdouts helped us <em>see</em> instability. Cross-validation gives us a systematic resampling design: in 5-fold cross-validation, each fold serves once as validation data while the remaining folds are used for training.</p>
+<button onclick="runCV()">Run 5-Fold Cross-Validation</button>
+<div id="cvResults" class="hidden"><table><thead><tr><th>Fold</th><th>Accuracy</th><th>Role</th></tr></thead><tbody id="cvbody"></tbody></table>
+<div class="metrics"><div class="metric"><div class="lab">CV Mean</div><div id="cvmean" class="val"></div></div><div class="metric"><div class="lab">CV Std. Dev.</div><div id="cvsd" class="val"></div></div></div>
+<div class="q"><b>Question It:</b> What does the spread across folds tell you that the mean alone does not?</div></div>
+</section>
+
+<section id="judgment" class="card hidden"><h2>6. Cross-Validation Is Not a Universal Recipe</h2>
+<table><thead><tr><th>Situation</th><th>Evaluation question</th></tr></thead><tbody>
+<tr><td>Imbalanced classes</td><td>Should folds preserve class proportions, and is accuracy appropriate?</td></tr>
+<tr><td>Time-ordered data</td><td>Would random splitting allow the model to learn from the future?</td></tr>
+<tr><td>Repeated observations / groups</td><td>Could related observations appear in both training and validation data?</td></tr>
+<tr><td>Preprocessing or feature selection</td><td>Was each step learned only from the training portion of each resample?</td></tr>
+<tr><td>Model tuning</td><td>Are the same observations being used both to choose the model and claim final performance?</td></tr>
+</tbody></table>
+<div class="call"><b>Leakage warning:</b> Resampling cannot rescue an evaluation if validation or test information has already influenced model development.</div>
+</section>
+
+<section id="final" class="card hidden"><h2>7. Think Like a Researcher</h2>
+<div class="q"><b>Your project:</b><br>What metric will you use? How will you split or resample the data? What leakage must you prevent? How will you communicate variability rather than only the most favorable score?</div>
+<div class="call"><b>Complete:</b> Based on this week's evidence, my evaluation strategy will __________ because __________.</div>
+</section>
+<div class="footer">Problem First. Model Second. Evaluation before celebration.</div>
+</div>
+<script>
+const scores=[.84,.91,.87,.82,.89,.85,.88,.83], cvs=[.86,.89,.84,.88,.87]; let shown=[];
+const pc=x=>(x*100).toFixed(1)+"%", avg=a=>a.reduce((s,v)=>s+v,0)/a.length;
+const stdev=a=>{let m=avg(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length)};
+function seededOrder(seed){let arr=[...Array(100).keys()],x=seed;for(let i=99;i>0;i--){x=(x*9301+49297)%233280;let j=Math.floor((x/233280)*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+function dots(id,seed){let test=new Set(seededOrder(seed).slice(0,20)),el=document.getElementById(id);el.innerHTML="";for(let i=0;i<100;i++){let d=document.createElement("div");d.className="dot"+(test.has(i)?" test":"");d.title=(test.has(i)?"Test":"Training")+" group "+(i+1);el.appendChild(d)}}
+dots("dots1",42);dots("dots2",91);
+function runFirst(){shown=[scores[0]];firstResult.classList.remove("hidden")}
+function showSecond(){secondCard.classList.remove("hidden");secondCard.scrollIntoView({behavior:"smooth"})}
+function startRepeats(){shown=[scores[0],scores[1]];repeatCard.classList.remove("hidden");draw();repeatCard.scrollIntoView({behavior:"smooth"})}
+function addSplit(){if(shown.length<scores.length)shown.push(scores[shown.length]);draw()}
+function draw(){count.textContent=shown.length;lo.textContent=pc(Math.min(...shown));hi.textContent=pc(Math.max(...shown));bars.innerHTML=shown.map((v,i)=>`<div class="barrow"><b>Split ${i+1}</b><div class="bar"><div class="fill" style="width:${v*100}%"></div></div><b>${pc(v)}</b></div>`).join("");if(shown.length>=5)reveal.classList.remove("hidden");if(shown.length===scores.length)again.disabled=true}
+function showDist(){mean.textContent=pc(avg(shown));sdout.textContent=(stdev(shown)*100).toFixed(1)+" pts";range.textContent=pc(Math.min(...shown))+" – "+pc(Math.max(...shown));distCard.classList.remove("hidden");distCard.scrollIntoView({behavior:"smooth"})}
+function showCV(){cvCard.classList.remove("hidden");cvCard.scrollIntoView({behavior:"smooth"})}
+function runCV(){cvbody.innerHTML=cvs.map((v,i)=>`<tr><td>Fold ${i+1}</td><td><b>${pc(v)}</b></td><td>Validation once; training in the other folds</td></tr>`).join("");cvmean.textContent=pc(avg(cvs));cvsd.textContent=(stdev(cvs)*100).toFixed(1)+" pts";cvResults.classList.remove("hidden");judgment.classList.remove("hidden");final.classList.remove("hidden")}
+</script></body></html>
